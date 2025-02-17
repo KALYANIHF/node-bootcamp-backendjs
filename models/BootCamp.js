@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const getGeoCoding = require("../utils/geocoder");
+const nodegeoCoder = require("node-geocoder");
 const BootCampSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -97,6 +99,22 @@ const BootCampSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+});
+
+// GEOCODE & CREATE LOCATION FIELD
+BootCampSchema.pre("save", async function (next) {
+  const geoaddress = await getGeoCoding(this.address);
+  this.location = {
+    type: "String",
+    coordinates: [geoaddress.results[0].lon, geoaddress.results[0].lat],
+    formattedAddress: geoaddress.results[0].formatted,
+    street: geoaddress.results[0].street,
+    city: geoaddress.results[0].city,
+    state: geoaddress.results[0].state_code,
+    zipcode: geoaddress.results[0].postcode,
+    country: geoaddress.results[0].country_code,
+  };
+  next();
 });
 
 module.exports = mongoose.model("Bootcamp", BootCampSchema);
