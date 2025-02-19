@@ -1,5 +1,5 @@
 const express = require("express");
-const router = express.Router();
+const bootcamp = express.Router();
 const {
   getBootcamps,
   getBootcamp,
@@ -9,12 +9,12 @@ const {
   updateBootcampPart,
   getBootcampsInRadius,
 } = require("../controllers/bootcamps");
-router.route("/").get(getBootcamps).post(createBootcamp);
-router
+bootcamp.route("/").get(getBootcamps).post(createBootcamp);
+bootcamp
   .route("/:id")
   .get(getBootcamp)
   .put(updateBootcamp)
   .patch(updateBootcampPart)
   .delete(deleteBootcamp);
-router.route("/radius/:address/:distance").get(getBootcampsInRadius);
-module.exports = router;
+bootcamp.route("/radius/:address/:distance").get(getBootcampsInRadius);
+module.exports = bootcamp;

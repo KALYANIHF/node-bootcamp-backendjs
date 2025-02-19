@@ -1,5 +1,6 @@
 const express = require("express");
-const router = require("./routes/route");
+const router = require("./routes/bootcamps");
+const course = require("./routes/courses");
 const dotenv = require("dotenv");
 const errorHandler = require("./middleware/error");
 dotenv.config({ path: "./config/.env" });
@@ -11,6 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1/bootcamps", router);
+// app.use("/api/v1/courses", course);
 app.use(errorHandler);
 
 app.listen(PORT, () => {

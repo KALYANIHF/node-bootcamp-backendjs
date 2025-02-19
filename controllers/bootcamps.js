@@ -4,13 +4,29 @@ const getGeoCoding = require("../utils/geocoder");
 const ErrorResponse = require("../utils/errorResponse");
 
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
+  let queryStr = JSON.stringify(req.query);
+  queryStr = queryStr.replace(
+    /\b(gt|gte|lt|lte|in)\b/g,
+    (match) => `$${match}`
+  );
+  const removeFields = ["select", "sort", "page", "limit"];
+  removeFields.forEach((field) => delete req.query[field]);
+  // create query string
+  if (req.query.select) {
+    let fields = req.query.select.split(",").join(" ");
+    var query = Bootcamp.find();
+    query = query.select(fields);
+  } else {
+    var query = Bootcamp.find(JSON.parse(queryStr));
+  }
   // get all the bootcamps
-  const bootcamps = await Bootcamp.find();
+  const bootcamps = await query;
   if (!bootcamps) {
     return next(new ErrorResponse("Resouces are not found", 404));
   } else {
     res.status(200).json({
       success: true,
+      count: bootcamps.length,
       data: bootcamps,
     });
   }
