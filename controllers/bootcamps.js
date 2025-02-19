@@ -1,5 +1,6 @@
 const asyncHandler = require("../middleware/asyncHandler");
 const Bootcamp = require("../models/BootCamp");
+const getGeoCoding = require("../utils/geocoder");
 const ErrorResponse = require("../utils/errorResponse");
 
 exports.getBootcamps = asyncHandler(async (req, res, next) => {
@@ -52,12 +53,12 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
   }
 });
 
-exports.updateBootcampPart = async (req, res, next) => {
+exports.updateBootcampPart = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     msg: `only Update bootcamp name with id ${req.params.id}`,
   });
-};
+});
 
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   const bootcamp = await Bootcamp.findByIdAndDelete(req.params.id);
@@ -70,4 +71,24 @@ exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
       msg: "Bootcamp deleted successfully",
     });
   }
+});
+
+exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
+  const { distance, address } = req.params;
+  const location = await getGeoCoding(address);
+  console.log(location);
+  const radius = distance / 3960;
+  const { lat, lon } = location.results[0];
+
+  const bootcamps = await Bootcamp.find({
+    location: { $geoWithin: { $centerSphere: [[lat, lon], radius] } },
+  });
+  if (!bootcamps || bootcamps.length === 0) {
+    return next(new ErrorResponse("Resouce not found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    count: bootcamps.length,
+    data: bootcamps,
+  });
 });
