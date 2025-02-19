@@ -12,7 +12,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1/bootcamps", router);
-// app.use("/api/v1/courses", course);
+app.use("/api/v1/courses", course);
 app.use(errorHandler);
 
 app.listen(PORT, () => {
