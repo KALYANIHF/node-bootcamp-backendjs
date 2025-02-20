@@ -12,7 +12,7 @@ exports.getCourses = asyncHandler(async (req, res, next) => {
   if (req.query.courseId) {
     query = Course.findById(req.query.courseId);
   } else {
-    query = Course.find();
+    query = Course.find().populate("bootcamp");
   }
   const courses = await query;
   if (!courses) {
@@ -46,9 +46,11 @@ exports.getCourse = asyncHandler(async (req, res, next) => {
 // @desc    Add course
 // @route   POST /api/v1/bootcamps/:bootcampId/courses
 // @access  Private
-exports.addCourse = asyncHandler(async (req, res, next) => {
-  req.body.bootcamp = req.params.bootcampId;
+exports.createCourse = asyncHandler(async (req, res, next) => {
   const course = await Course.create(req.body);
+  if (!course) {
+    return next(new ErrorResponse("Resouces are not found", 404));
+  }
   res.status(200).json({
     success: true,
     data: course,

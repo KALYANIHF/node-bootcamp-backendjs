@@ -1,5 +1,6 @@
 const express = require("express");
 const bootcamp = express.Router();
+const courses = require("./courses");
 const {
   getBootcamps,
   getBootcamp,
@@ -10,6 +11,7 @@ const {
   getBootcampsInRadius,
 } = require("../controllers/bootcamps");
 bootcamp.route("/").get(getBootcamps).post(createBootcamp);
+bootcamp.use("/:bootcampId/courses", courses);
 bootcamp
   .route("/:id")
   .get(getBootcamp)
